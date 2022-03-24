@@ -24,7 +24,8 @@ const User = sequelize.define('user', {
   },
 
   password: {
-    type: DataTypes.STRING(255)
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
 
   status: {
@@ -35,7 +36,8 @@ const User = sequelize.define('user', {
 
   role: {
     type: DataTypes.STRING(30),
-    allowNull: false
+    allowNull: false,
+    defaultValue: 'guest'
   }
 });
 module.exports = { User };
