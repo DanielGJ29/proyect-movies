@@ -3,6 +3,7 @@ const { Actor } = require('../models/actors.model');
 //Utils
 const { catchAsync } = require('../util/catchAsync');
 const { AppError } = require('../util/appError');
+const { filterObj } = require('../util/filterObj');
 
 //?Get all Actors
 exports.getAllActors = catchAsync(async (req, res, next) => {
@@ -13,18 +14,18 @@ exports.getAllActors = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: { data }
+    data: { actors }
   });
 });
 
-//?Get user by Id
+//?Get Actors by Id
 exports.getActorsById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
   const actor = await Actor.findOne({ where: { id } });
 
-  if (!user) {
-    return next(new AppError(404, 'User not found'));
+  if (!actor) {
+    return next(new AppError(404, 'Actors not found'));
   }
 
   res.status(200).json({
@@ -55,10 +56,47 @@ exports.createActor = catchAsync(async (req, res, next) => {
   });
 });
 
-//?Update post put
-// exports.updateActorPut = catchAsync(async(req,res,next)=>{
+//?Update Actors
+exports.updateActor = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
 
-// });
-// exports.updateActor = catchAsync(async (req, res) => {});
+  const data = filterObj(req.body, 'name', 'country', 'rating', 'age');
 
-// exports.deleteActor = catchAsync(async (req, res) => {});
+  const actors = await Actor.findOne({ where: { id: id } });
+
+  if (!actors) {
+    res.status(404).json({
+      status: 'error',
+      message: 'Cant update actors, invalid Id'
+    });
+    return;
+  }
+
+  await actors.update({ ...data });
+
+  res.status(204).json({
+    status: 'success'
+  });
+});
+
+exports.deleteActor = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const actor = await Actor.findOne({
+    where: { id: id, status: 'active' }
+  });
+
+  if (!actor) {
+    res.status(404).json({
+      status: 'error',
+      message: 'Cant delete Actor, Invalid Id'
+    });
+    return;
+  }
+
+  await actor.update({ status: 'deleted' });
+
+  res.status(204).json({
+    status: 'success'
+  });
+});
