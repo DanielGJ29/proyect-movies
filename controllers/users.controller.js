@@ -10,6 +10,7 @@ const { catchAsync } = require('../util/catchAsync');
 const { AppError } = require('../util/appError.js');
 const { filterObj } = require('../util/filterObj');
 const { password } = require('pg/lib/defaults');
+const { Email } = require('../util/email');
 
 dotenv.config({ path: '../config.env' });
 
@@ -62,6 +63,9 @@ exports.createUser = catchAsync(async (req, res, next) => {
   });
 
   newUser.password = undefined;
+
+  //Sent msil to newly created account
+  await new Email(email).send();
 
   res.status(201).json({
     status: 'success',
@@ -124,7 +128,7 @@ exports.loginUser = catchAsync(async (req, res, next) => {
   // }
 
   //JWT
-  const token = await jwt.sing({ id: user.id }, process.env.JWT_SECRET, {
+  const token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 

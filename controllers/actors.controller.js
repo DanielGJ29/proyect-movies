@@ -8,8 +8,8 @@ const { filterObj } = require('../util/filterObj');
 //?Get all Actors
 exports.getAllActors = catchAsync(async (req, res, next) => {
   const actors = await Actor.findAll({
-    where: { status: 'active' }
-    // attributes: { exclude: ['password'] },
+    where: { status: 'active' },
+    attributes: { exclude: ['password'] }
   });
 
   res.status(200).json({
@@ -22,7 +22,10 @@ exports.getAllActors = catchAsync(async (req, res, next) => {
 exports.getActorsById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  const actor = await Actor.findOne({ where: { id } });
+  const actor = await Actor.findOne({
+    where: { id },
+    attributes: { exclude: ['password'] }
+  });
 
   if (!actor) {
     return next(new AppError(404, 'Actors not found'));

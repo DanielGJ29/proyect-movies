@@ -9,13 +9,16 @@ const {
   loginUser
 } = require('../controllers/users.controller');
 
+//Middlewares
+const { validateSession } = require('../middlewares/auth.middleware.js');
+
 const router = express.Router();
 
-router.get('/', getAllUsers);
+router.get('/', validateSession, getAllUsers);
 
-router.get('/:id', getUserById);
+router.get('/:id', validateSession, getUserById);
 
-router.post('/', createUser);
+router.post('/', validateSession, createUser);
 
 router.patch('/:id', updateUser);
 
