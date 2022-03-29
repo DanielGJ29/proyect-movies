@@ -29,10 +29,6 @@ exports.validateSession = catchAsync(async (req, res, next) => {
     process.env.JWT_SECRET
   );
 
-  if (!decodedToken) {
-    return next(new AppError(401, 'Invalid session'));
-  }
-
   const user = await User.findOne({
     attributes: { exclude: ['password'] },
     where: { id: decodedToken.id, status: 'active' }
@@ -43,5 +39,12 @@ exports.validateSession = catchAsync(async (req, res, next) => {
   }
 
   req.currentUser = user;
+  next();
+});
+
+exports.protectAdmin = catchAsync(async (req, res, next) => {
+  if (req.currentUser.role !== 'admin') {
+    return next(new AppError(403, 'Acces denied'));
+  }
   next();
 });

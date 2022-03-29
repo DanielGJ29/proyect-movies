@@ -17,6 +17,7 @@ dotenv.config({ path: '../config.env' });
 //?All users
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll({
+    attributes: { exclude: 'password' },
     where: { status: 'active' }
   });
 
